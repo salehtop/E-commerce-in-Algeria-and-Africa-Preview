@@ -1,0 +1,64 @@
+---
+title: "E-commerce Data Analysis Preview"
+author: "Mohamed Saleh Mehimmedetsi"
+date: "2025-11-16"
+output: html_document
+---
+## 1. Introduction:
+
+This repository serves as a **public preview** of my full Data Analysis Project for ecommerce operations in Algeria and Africa.  
+The goal of this preview is to showcase a sample of the **RStudio code**, **workflow**, and **analytical insights** used in the main private project, without exposing sensitive or confidential business data.
+
+The R Markdown document you are reading includes:
+- Selected and simplified R code excerpts from the main RStudio project files (Ecommerce, Ecommerce 2, Ecommerce 3).
+- Example visualizations and KPI calculations.
+- A demonstration of my analysis methodology, including data cleaning, transformation, and insights generation.
+- Summaries of findings related to advertising performance, product profitability, delivery operations, and revenue estimation.
+
+The full project contains more detailed financial models, full datasets, and advanced exploratory analysis.  
+This preview focuses on **transparency**, **methodology**, and **demonstrating technical competency**, while keeping the core business data private.
+
+### 2.4. Africa — Weighted CPM Analysis
+
+```{r africa_cpm, message=FALSE, warning=FALSE}
+# Load libraries
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+
+# === Africa Data ===
+file_path <- "Facebook.xlsx"
+africa <- read_excel(file_path, sheet = "Africa")
+
+# Compute weighted CPM per month
+africa_cpm <- africa %>%
+  mutate(
+    month = floor_date(as.Date(Date, format = "%Y-%m-%d"), "month")
+  ) %>%
+  group_by(month) %>%
+  summarise(
+    total_spend = sum(`Amount spent (EUR)`, na.rm = TRUE),
+    weighted_cpm = sum(`CPM (EUR)` * `Amount spent (EUR)`, na.rm = TRUE) /
+                   sum(`Amount spent (EUR)`, na.rm = TRUE)
+  ) %>%
+  filter(total_spend > 0)
+
+# Plot weighted CPM by month
+ggplot(africa_cpm, aes(x = month, y = weighted_cpm)) +
+  geom_line(color = "#009E73", size = 1.2) +
+  geom_point(color = "#009E73", size = 3) +
+  labs(
+    title = "Weighted Average CPM by Month — Africa",
+    x = "Month",
+    y = "Weighted CPM (EUR)"
+  ) +
+  theme_minimal()
+```
+
+#### 2.3.2 Africa: Store-Level Dominance
+In Africa, the strategy was the opposite: a **single, consistent video ad and copywriting style** was used across campaigns, reducing variation at the creative level.  
+However, the **landing page experience** became the differentiator, as all traffic was directed to a **Shopify store page template**.  
+
+Because the creative input was constant, differences in performance were primarily influenced by what happened **after the click** — such as how efficiently users engaged and converted on the store.  
+As a result, **Landing Page Views** and **Cost per Landing Page View** emerged as the dominant factors, indicating that **store-level interactions** and user journey optimization were the key drivers of success in this market.
